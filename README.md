@@ -15,6 +15,8 @@ Unified observability for **pipelines, jobs, stages and PRs** across multiple CI
 - **Pipeline Execution Flamegraph**: hierarchical view of the job execution in that pipeline.
 - **OpenPipeline Setup**:
   - Setup wizard for importing and removing OpenPipeline rules
+- **Support to Custom CI/CD Providers**:
+  - Event description below
 - **Supported Technologies**:
   - **Azure Devops**
   - **Gitlab Pipelines**
@@ -44,6 +46,51 @@ Unified observability for **pipelines, jobs, stages and PRs** across multiple CI
    
 
 ---
+
+## ✨ Custom Events Format
+### Pipeline Run Event
+```json
+{
+    "cicd.pipeline.id" : "xxxxxxx", // Pipeline ID
+    "cicd.pipeline.run.id": 1999999, // ID of that specific execution
+    "cicd.pipeline.name" : "My Pipeline",
+    "cicd.pipeline.run.outcome" : "success" // valid values "success" | "partiallySuccess" | "canceled" | "failed" | "failure" | "rejected"| "skipped",
+    "cicd.pipeline.run.url.full": "https://my.cicd-tool.com/pipeline/run/123",
+    "ext.pipeline.build.name" : "PR 99: adding awesome feature" // name of the commit / build message
+    "ext.pipeline.run.trigger.user" : "John",  // Who started the pipeline
+    "vcs.ref.head.name" : "Head Branch Name",
+    "vcs.repository.name" : "Repository Name",
+    "event.category" : "pipeline", // exactly like that as it's used for filtering
+    "event.status": "finished" || "started",
+    "event.type" : "push, build, deploy, etc",
+    "event.provider" : "Custom Provider",
+    "duration": 160, // in seconds
+    "start_time": ""2025-11-05T21:02:30.000000000Z", // Timestamp of start of the Execution
+    "end_time": ""2025-11-05T21:05:30.000000000Z" // Timestamp of end of the Execution or null if still running
+}
+```
+
+### Job/Task Run Event
+```json
+{
+    "task.id" : "xxxxxxx", # Job ID
+    "task.name" : "My Pipeline",
+    "task.outcome" : "success" // valid values "success" | "partiallySuccess" | "canceled" | "failed" | "failure" | "rejected"| "skipped",
+    "cicd.pipeline.run.id": 1999999, // ID of the execution of pipeline running this job
+    "cicd.pipeline.id" : "xxxxxxx", // Pipeline ID
+    "cicd.pipeline.name" : "My Pipeline",
+    "vcs.ref.head.name" : "Head Branch Name",
+    "job.steps" : ["{\"name\":\"Set up job\", \"status\":\"completed\", \"conclusion\":\"success\", \"number\":1, \"started_at\":\"2025-11-12T16:11:24Z\", \"completed_at\":\"2025-11-12T16:11:26Z\"}"] // Array of steps following this structure or null if there are no steps in the job execution
+    "task.retry": 1, // Attempts to run this job
+    "event.category" : "task", // exactly like that as it's used for filtering
+    "event.status": "finished" || "started",
+    "event.type" : "push, build, deploy, etc",
+    "event.provider" : "Custom Provider",
+    "duration": 160, // in seconds
+    "start_time": "2025-11-05T21:02:30.000000000Z", // Timestamp of start of the Execution
+    "end_time": "2025-11-05T21:05:30.000000000Z" // Timestamp of end of the Execution or null if still running
+}
+```
 
 ## 🗺️ Roadmap
 
